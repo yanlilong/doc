@@ -1,3 +1,43 @@
 Docker Comand:
 
 1. docker ps --size
+https://github.com/docker/docker.github.io/issues/1520
+The "size" and "virtual size" describe the amount of disk space used by a container. Let me try and explain:
+
+When starting a container, the image that the container is started from is mounted read-only. On top of that, a writable layer is mounted, in which any changes made to the container are written.
+
+The read-only layers of an image can be shared between any container that is started from the same image, whereas the "writable" layer is unique per container (because: you don't want changes made in container "a" to appear in container "b" smile)
+
+Back to the docker ps -s output;
+
+    The "size" information shows the amount of data (on disk) that is used for the writable layer of each container
+    The "virtual size" is the total amount of disk-space used for the read-only image data used by the container and the writable layer.
+
+The reason it's named "virtual size", is that (as described earlier), the disk space for the read-only layer(s) can be shared between containers, so only take up disk space once (perhaps a different name ("shared" size?) would have been better in hindsight, but naming is hard smile). edit: virtual actually shows the combined size of the readonly layer (the image), and the writable layer of the container.
+
+In the example below, I started 10 nginx containers;
+
+CONTAINER ID        IMAGE                      COMMAND                  CREATED              STATUS              PORTS               NAMES                                         SIZE
+6ca0cef8db8d        nginx                      "nginx -g 'daemon ..."   55 seconds ago       Up 54 seconds       80/tcp, 443/tcp     pedantic_mahavira                             2B (virtual 183MB)
+0b75532c34d2        nginx                      "nginx -g 'daemon ..."   56 seconds ago       Up 55 seconds       80/tcp, 443/tcp     hardcore_haibt                                2B (virtual 183MB)
+a86d8818795d        nginx                      "nginx -g 'daemon ..."   56 seconds ago       Up 55 seconds       80/tcp, 443/tcp     happy_pasteur                                 2B (virtual 183MB)
+3e9151f0332d        nginx                      "nginx -g 'daemon ..."   57 seconds ago       Up 56 seconds       80/tcp, 443/tcp     pensive_khorana                               2B (virtual 183MB)
+429c418114a1        nginx                      "nginx -g 'daemon ..."   57 seconds ago       Up 56 seconds       80/tcp, 443/tcp     nostalgic_bose                                2B (virtual 183MB)
+01f6a0818b32        nginx                      "nginx -g 'daemon ..."   58 seconds ago       Up 57 seconds       80/tcp, 443/tcp     zen_davinci                                   2B (virtual 183MB)
+9ed93ee43912        nginx                      "nginx -g 'daemon ..."   58 seconds ago       Up 58 seconds       80/tcp, 443/tcp     unruffled_ptolemy                             2B (virtual 183MB)
+c7c17bf50744        nginx                      "nginx -g 'daemon ..."   59 seconds ago       Up 58 seconds       80/tcp, 443/tcp     zen_khorana                                   2B (virtual 183MB)
+a7b0502d95ce        nginx                      "nginx -g 'daemon ..."   About a minute ago   Up About a minute   80/tcp, 443/tcp     gallant_leavitt                               2B (virtual 183MB)
+8b9e9ee6c4e8        nginx                      "nginx -g 'daemon ..."   About a minute ago   Up About a minute   80/tcp, 443/tcp     clever_pasteur                                2B (virtual 183MB)
+
+All these containers use the same image, so the "Virtual size" (183MB in the example) is used only once, irregardless of how many containers are started from the same image - I can start 1 container or a thousand; no extra disk space is used. The "Size" (2B in the example) is unique per container though, so the total space used on disk is:
+
+183MB + 10 * 2B
+
+Be aware that the size shown does not include all disk space used for a container. Things that are not included currently are;
+
+    disk space used for log-files (if you use the json-file logging driver) - which can be quite a bit if your container generates a lot of logs, and log-rotation (max-file / max-size logging options) is not configured
+    volumes used by the container
+    disk space used for the container's configuration files (hostconfig.json, config.v2.json, hosts, hostname, resolv.conf) - although these files are small
+    memory written to disk (if swapping is enabled)
+    checkpoints (if you're using the experimental checkpoint/restore feature)
+

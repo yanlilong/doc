@@ -40,4 +40,15 @@ Be aware that the size shown does not include all disk space used for a containe
     disk space used for the container's configuration files (hostconfig.json, config.v2.json, hosts, hostname, resolv.conf) - although these files are small
     memory written to disk (if swapping is enabled)
     checkpoints (if you're using the experimental checkpoint/restore feature)
+    
+    
+2.maven-assembly-plugin Error with alfresco SDK 4.0, Openjdk11
+Exception-info:
+org.apache.maven.plugins:maven-assembly-plugin:2.6:single (build-amp-file) on project adb-eakte-platform-jar:
+Execution build-amp-file of goal org.apache.maven.plugins:maven-assembly-plugin:2.6:single failed: An API incompatibility
+was encountered while executing org.apache.maven.plugins:maven-assembly-plugin:2.6:single: java.lang.ExceptionInInitializerError: null
+
+
+2.6 remove version tag from maven-assembly-plugin in AIO project's parent POM.
+
 

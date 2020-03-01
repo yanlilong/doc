@@ -1,3 +1,31 @@
+Dockerfile:
+What is Dockerfile?
+1. image automatically build by reading the instructions from  Dockerfile.
+
+2. text document that contains all the commands a user could call on the command line to assemble an image.
+
+Dockerfile parameters:
+
+    FROM:  base for our image, for example, we will take the Java-enabled Alpine Linux, created in the previous section
+
+    COPY: We let Docker copy our jar file into the image
+
+    ENV: This command lets us define some environment variables, which will be respected by the application running in the container. Here we define a customized Spring Boot Application configuration, to hand-over to the jar-executable later
+
+    ENTRYPOINT/CMD: This will be the executable to start when the container is booting. We must define them as JSON-Array, because we will use an ENTRYPOINT in combination with a CMD for some application arguments
+
+    VOLUME: Because our container will be running in an isolated environment, with no direct network access, we have to define a mountpoint-placeholder for our configuration repository
+
+    EXPOSE: Here we are telling Docker, on which port our application is listing. This port will be published to the host, when the container is booting
+
+
+ One Example: create Dockerfile for a simple spring-boot projekt.
+ https://spring.io/blog/2018/11/08/spring-boot-in-a-container
+
+
+
+ docker-compose
+
 Docker Comand:
 
 1. docker ps --size

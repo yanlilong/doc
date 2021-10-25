@@ -1,0 +1,4 @@
+Docker has three Store to management images:
+1.Imagestore
+2.Layerstore
+3.ReferenceStore
